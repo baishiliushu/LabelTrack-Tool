@@ -3,8 +3,8 @@ save_result: False
 fp16: False
 experiment_name: AutoLabelTrack
 name: bytetrack_tiny_track
-exp_file: ./Tracking/exps/default/yolox_tiny.py
-ckpt: /mnt/d/bigProject/graduationDesign/use/weights/yolox_tiny_best_ckpt.pth.tar # 自行修改
+exp_file: ./Tracking/exps/example/mot/yolox_tiny_vd.py #./Tracking/exps/default/yolox_tiny.py
+ckpt: /home/leon/mount_point_c/data-track/labeltrack-models/yolox_tiny_best_ckpt.pth.tar # /mnt/d/bigProject/graduationDesign/use/weights/yolox_tiny_best_ckpt.pth.tar # 自行修改
 device: gpu
 fps: 30
 track_thresh: 0.5

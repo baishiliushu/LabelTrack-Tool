@@ -8,5 +8,4 @@ exps
 tools
 tutorials
 videos
-weights
 yolox

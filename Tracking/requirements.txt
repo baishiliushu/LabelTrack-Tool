@@ -44,6 +44,6 @@ yapf
 isort==4.3.21
 imageio
 
-opencv-python-headless
-pyqt5
-qt-material
+##opencv-python-headless
+##pyqt5
+##qt-material

@@ -239,6 +239,9 @@
         <property name="flat">
          <bool>true</bool>
         </property>
+        <property name="shortcut">
+         <string>b</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -264,6 +267,9 @@
         </property>
         <property name="flat">
          <bool>true</bool>
+        </property>
+        <property name="shortcut">
+         <string>n</string>
         </property>
        </widget>
       </item>
@@ -473,7 +479,7 @@
     <string>标注</string>
    </property>
    <property name="shortcut">
-    <string>W</string>
+    <string>w</string>
    </property>
   </action>
   <action name="actionDict">

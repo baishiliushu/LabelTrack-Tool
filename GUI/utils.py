@@ -152,6 +152,8 @@ def get_image_list(path):
             ext = osp.splitext(apath)[1]
             if ext in IMAGE_EXT:
                 image_names.append(apath)
+    # add filename sort 20240411
+    image_names.sort()
     return image_names
 
 # QT4 has a trimmed method, in QT5 this is called strip

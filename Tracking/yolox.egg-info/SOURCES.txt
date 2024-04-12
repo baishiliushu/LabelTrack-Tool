@@ -1,8 +1,8 @@
 LICENSE
 setup.cfg
 setup.py
-/mnt/d/bigProject/graduationDesign/LabelTrack/Tracking/yolox/layers/csrc/vision.cpp
-/mnt/d/bigProject/graduationDesign/LabelTrack/Tracking/yolox/layers/csrc/cocoeval/cocoeval.cpp
+/opt/projects/githubs/LabelTrack-Tool/Tracking/yolox/layers/csrc/vision.cpp
+/opt/projects/githubs/LabelTrack-Tool/Tracking/yolox/layers/csrc/cocoeval/cocoeval.cpp
 configs/configs.py
 demo/bytetrack.py
 demo/deepsort.py

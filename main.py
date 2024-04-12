@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 import os
 import sys
 import cv2
@@ -12,7 +13,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import *
 from PyQt5.QtMultimediaWidgets import QVideoWidget
 
-from qt_material import apply_stylesheet, QtStyleTools, density
+from qt_material import apply_stylesheet, QtStyleTools  #, density
+#import qt_material
 
 from GUI.tools import img_cv_to_qt
 from GUI.label_combox import DefaultLabelComboBox
@@ -103,7 +105,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.actionFit.triggered.connect(self.adjust_scale)
         
         # 标签
-        self.labelHint = ['pedestrian', 'people', 'bicycle', 'car', 'van', 'truck', 'tricycle', 'awning-tricycle', 'bus', 'motor', 'others']
+        self.labelHint = ['pedestrian']  # ,'pedestrian', 'bicycle', 'car', 'van', 'truck', 'tricycle', 'awning-tricycle', 'bus', 'motor', 'others'
         self.defaultLabel = self.labelHint[0]
         self.labelCombobox = DefaultLabelComboBox(self, items = self.labelHint)
         self.toolBarVertical.addWidget(self.labelCombobox)
@@ -127,7 +129,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.vedioSlider.valueChanged.connect(self.move_slider)
 
         # 模型选择框
-        self.model = ["yolox_tiny_vd", "yolox_m_vd", "yolox_l_vd"]
+        self.model = ["bytetrack_m"]  # , "yolox_l_vd", "yolox_tiny_vd", "yolox_m_vd", "customs"
         self.modelDialog = ModelDialog(parent=self, model=self.model)
         self.currentModel = self.modelDialog.currentModel
 
@@ -169,13 +171,6 @@ class MyWindow(QMainWindow, QtStyleTools):
             self.playTimer.stop()
             self.pushButtonPlay.setIcon(QIcon("./GUI/resources/svg/play.svg"))
             self.pushButtonPlay.setText(" PLAY")
-
-    # 加载标注文件 .txt
-    def load_file(self):
-        self.statusBar.showMessage("正在加载标注文件，请稍后")
-        self.labelPath, _ = QFileDialog.getOpenFileName(self, "Choose annotation file", "", "txt(*.txt)")  
-        self.loadWorker.load_path(self.labelPath)
-        self.loadWorker.start()
 
     def update_load_status(self, message):
         self.statusBar.showMessage(message)
@@ -378,7 +373,7 @@ class MyWindow(QMainWindow, QtStyleTools):
                 return os.path.splitext(full_file_path)[0]  # Return file path without the extension.
             else:
                 return full_file_path
-        return ''
+        return os.path.splitext(self.filePath)[0] + 'auto_gen_0.txt'
         
     def save_labels(self, savedPath):
         results = []
@@ -395,9 +390,7 @@ class MyWindow(QMainWindow, QtStyleTools):
             w = max_x - min_x
             h = max_y - min_y
             classId = VISDRONE_CLASSES.index(shape.label)
-            results.append(
-                f"{shape.frameId},{shape.id},{min_x},{min_y},{w},{h},{shape.score:.2f},{classId},0,0\n"
-            )
+            results.append("{},{},{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id,min_x,min_y,w,h,shape.score,classId))
             # if shape.auto == 'M':
             #     # TODO
             #     for i in range(1, self.canvas.numFrames + 1):
@@ -408,10 +401,17 @@ class MyWindow(QMainWindow, QtStyleTools):
             #     results.append(
             #         f"{shape.frameId},{shape.id},{min_x},{min_y},{w},{h},{shape.score:.2f},{classId},0,0\n"
             #     )
-            
+
         with open(savedPath, 'w') as f:
             f.writelines(results)
-            print(f"save results to {savedPath}")
+            print("save results to {}".format(savedPath))
+
+    # 加载标注文件 .txt
+    def load_file(self):
+        self.statusBar.showMessage("正在加载标注文件，请稍后")
+        self.labelPath, _ = QFileDialog.getOpenFileName(self, "Choose annotation file", "", "txt(*.txt)")
+        self.loadWorker.load_path(self.labelPath)
+        self.loadWorker.start()
 
     # 删除选中的框
     def delete_selected_shape(self):
@@ -421,8 +421,13 @@ class MyWindow(QMainWindow, QtStyleTools):
         key = ev.key()
         if key == Qt.Key_Delete or key == Qt.Key_S:
             self.delete_selected_shape()
+        if key == Qt.Key_Left:
+            lambda: self.jump_frame(dpos=-1)
+        if key == Qt.Key_Right:
+            lambda: self.jump_frame(dpos=1)
 
     def closeEvent(self, event):
+        self.save_labels(os.path.splitext(self.filePath)[0] + 'auto_gen_when_exit.txt')
         sys.exit(0)
 
 

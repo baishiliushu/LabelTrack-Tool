@@ -53,7 +53,12 @@ class trackWorker(QThread):
         self.sinOut.emit("加载模型权重")
 
         ckpt = torch.load(ckpt_file, map_location="cpu")
-        model.load_state_dict(ckpt["model"])
+
+        if "model" in  ckpt.keys():
+            model.load_state_dict(ckpt["model"])
+        else:
+            model.load_state_dict(ckpt)
+
         print("loaded checkpoint done.")
         self.sinOut.emit("模型权重加载完成")
 

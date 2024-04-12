@@ -1,3 +1,5 @@
+import os.path
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 import sys
@@ -18,6 +20,9 @@ class loadWorker(QThread):
         self.labelPath = labelPath
 
     def load_label(self):
+        if not os.path.exists(self.labelPath):
+            #self.sinOut.emit("[ERR]{} NOT exists.".format(self.labelPath))
+            return
         with open(self.labelPath, "r") as f:
             count = len(open(self.labelPath,'rU').readlines())
             for i, line in enumerate(f.readlines(), 1):
