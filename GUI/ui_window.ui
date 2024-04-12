@@ -401,10 +401,10 @@
     <string>保存</string>
    </property>
    <property name="toolTip">
-    <string>保存视频 [Ctrl+S]</string>
+    <string>保存文件夹 [Ctrl+Shift+S]；保存[Ctrl+S]</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string>Ctrl+Shift+S</string>
    </property>
   </action>
   <action name="actionUndo">
@@ -524,7 +524,7 @@
      <normaloff>resources/svg/delete.svg</normaloff>resources/svg/delete.svg</iconset>
    </property>
    <property name="text">
-    <string>清除</string>
+    <string>清除所有框</string>
    </property>
    <property name="toolTip">
     <string>清除所有标注框</string>

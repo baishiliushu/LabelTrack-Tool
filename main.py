@@ -49,6 +49,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         
         self.canvas = canvas(parent=self)
 
+
         # 视频播放器
         self.player = QMediaPlayer() 
         self.videoFileUrl = ""
@@ -57,6 +58,10 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.canvas.fileWorker.finished.connect(self.open_file_finish)
         self.loadWorker = loadWorker(self.canvas)
         self.loadWorker.sinOut.connect(self.update_load_status)
+
+        # add local path manager
+        self.data_path = os.path.abspath(os.path.dirname(__file__))
+        self.default_anno_txt = "gt_label.txt"
 
         # 状态栏
         self.statusBar = self.statusBar() # 状态栏
@@ -347,13 +352,22 @@ class MyWindow(QMainWindow, QtStyleTools):
         # self.set_dirty() # 发生更新，可以保存
 
     def current_path(self):
-        return os.path.dirname(self.filePath) if self.filePath else '.'
+        
+        return self.filePath if os.path.exists(self.filePath) else '.'
+
+    def new_data_path(self, user_set=None):
+        if user_set is not None:
+            tmp_p = os.path.abspath(os.path.dirname(user_set))
+            if os.path.exists(tmp_p):
+                self.data_path = tmp_p
+            self.statusBar.showMessage("[Update]data_path :{}".format(self.data_path))
 
     def save_file(self):
         # image_file_dir = os.path.dirname(self.filePath)
         # image_file_name = os.path.basename(self.filePath)
         # saved_file_name = os.path.splitext(image_file_name)[0]
         savedPath = self.save_file_dialog(remove_ext=False)
+        self.statusBar.showMessage("[Update]{}".format(savedPath))
         self.save_labels(savedPath)
     
     def save_file_dialog(self, remove_ext=True):
@@ -419,12 +433,14 @@ class MyWindow(QMainWindow, QtStyleTools):
 
     def keyPressEvent(self, ev):
         key = ev.key()
-        if key == Qt.Key_Delete or key == Qt.Key_S:
+        if key == Qt.Key_Delete or key == Qt.Key_D:
             self.delete_selected_shape()
         if key == Qt.Key_Left:
             lambda: self.jump_frame(dpos=-1)
         if key == Qt.Key_Right:
             lambda: self.jump_frame(dpos=1)
+        if (key == Qt.Key_S) and QApplication.keyboardModifiers() == Qt.ControlModifier:
+            self.statusBar.showMessage("[DEBUG]ctrl + s ")
 
     def closeEvent(self, event):
         self.save_labels(os.path.splitext(self.filePath)[0] + 'auto_gen_when_exit.txt')

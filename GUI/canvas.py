@@ -134,7 +134,7 @@ class canvas(QWidget):
         if self.current.points[0] == self.current.points[-1]:
             self.current = None
             self.drawingPolygon.emit(False)
-            self.update()
+
             return
 
         # self.shapeId += 1
@@ -144,7 +144,9 @@ class canvas(QWidget):
         self.current.score = 1
         self.current.close()
         # self.shapes.append(self.current)
-        for i in range(self.curFramesId, self.numFrames + 1):
+
+        # for i in range(self.curFramesId, self.numFrames + 1):
+        for i in range(self.curFramesId, self.curFramesId + 1):
             newManualShape = Shape()
             newManualShape = self.current.copy()
             newManualShape.frameId = i
@@ -160,7 +162,7 @@ class canvas(QWidget):
         newManualShape = None
         # self.set_hiding(False)
         self.newShape.emit()
-        self.update()
+
 
     def update_shape(self, id, frameId, cls_id, tlwh, score, auto = 'M'):
         detectPos = Shape()
@@ -220,15 +222,23 @@ class canvas(QWidget):
             self.current.add_point(QPointF(max_x, min_y))
             self.current.add_point(target_pos)
             self.current.add_point(QPointF(min_x, max_y))
-            
+
             self.finalise()
+
         elif not self.out_of_pixmap(pos):
             self.current = Shape()
             self.current.add_point(pos)
             self.line.points = [pos, pos]
             # self.set_hiding()
             self.drawingPolygon.emit(True)
-            self.update()
+
+        # if not self.out_of_pixmap(pos):
+        #     self.current = Shape()
+        #     self.current.add_point(pos)
+        #     self.line.points = [pos, pos]
+        #     # self.set_hiding()
+        #     self.drawingPolygon.emit(True)
+        self.update()
 
     def set_editing(self, value=True):
         self.mode = self.EDIT if value else self.CREATE
