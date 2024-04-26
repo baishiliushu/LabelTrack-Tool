@@ -574,10 +574,13 @@ class canvas(QWidget):
             if self.drawing():
                 self.handle_drawing(pos)
             else:
-                pass
+                ##pass
                 selection = self.select_shape_point(pos)
                 self.prev_point = pos
                 if selection is None:
+                    pass
+                else:
+                    # todo: wait keyborad recall
                     pass
                 #     # pan
                 #     QApplication.setOverrideCursor(QCursor(Qt.OpenHandCursor))
@@ -610,6 +613,15 @@ class canvas(QWidget):
                         self.set_shape_label(shape, text, id, generate_line_color, generate_fill_color)
                         break
         self.repaint()
+
+    def rewriteByFixedId(self, id_fixed):
+        if self.selected_shape:
+            for shape in reversed([s for s in self.shapes]):
+                if shape.selected and shape.frameId == self.curFramesId:
+                    generate_line_color, generate_fill_color = generate_color_by_text("pedestrian")
+                    self.set_shape_label(shape, "pedestrian", id_fixed, generate_line_color, generate_fill_color)
+        self.repaint()
+
 
     def wheelEvent(self, ev):
         qt_version = 4 if hasattr(ev, "delta") else 5
