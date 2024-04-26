@@ -378,7 +378,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         dlg = QFileDialog(self, caption, open_dialog_path, filters)
         # dlg.setDefaultSuffix(LabelFile.suffix[1:])
         dlg.setAcceptMode(QFileDialog.AcceptSave)
-        filename = os.path.splitext(self.filePath)[0] + '.txt'
+        filename = os.path.splitext(self.filePath)[0] + 'annos.txt'
         dlg.selectFile(filename)
         dlg.setOption(QFileDialog.DontUseNativeDialog, False)
         if dlg.exec_():
