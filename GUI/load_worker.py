@@ -29,9 +29,17 @@ class loadWorker(QThread):
                 # line = line.strip('\n').split(',')
                 line = line.replace("|", ",")
                 line = line.replace(";", ",")
-                line = line.strip('\n').split(',')
-                tlwh = [int(line[2]), int(line[3]), int(line[4]), int(line[5])]
-                self.canvas.update_shape(int(line[1]), int(line[0]), int(line[7]), tlwh, float(line[6]), 'L')
+                lines = line.strip('\n').split(',')
+                for ll in lines:
+                    if ll == "":
+                        print("[DEBUG]No.{}->{}:{}".format(i, line.strip('\n'), lines))
+                        lines.remove(ll)
+                if len(lines) < 7:
+                    print("[continue]No.{}->{}:{}".format(i, line.strip('\n'), lines))
+                    continue
+                # print("[DEBUG]No.{}->{}:{}".format(i, line.strip('\n'), lines))
+                tlwh = [int(lines[2]), int(lines[3]), int(lines[4]), int(lines[5])]
+                self.canvas.update_shape(int(lines[1]), int(lines[0]), int(lines[7]), tlwh, float(lines[6]), 'L')
                 if i % 10 == 0:
                     self.sinOut.emit("标注框已加载 {} / {}".format(i, count))
         self.sinOut.emit("标注文件已加载完成")

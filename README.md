@@ -46,7 +46,7 @@ python main.py
 3.1 delete error influence-IDs:
 sed -i -e '/,1|/d' annos.txt
 3.2 replace target-IDs:（48 --> 1）
-sed -i 's/,48|/,1|,/' annos.txt
+sed -i 's/,48|/,1|/' annos.txt
 ```
 
 ## 已更新
