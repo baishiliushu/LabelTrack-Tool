@@ -134,7 +134,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.vedioSlider.valueChanged.connect(self.move_slider)
 
         # 模型选择框
-        self.model = ["bytetrack_m"]  # , "yolox_l_vd", "yolox_tiny_vd", "yolox_m_vd", "customs"
+        self.model = ["bytetrack_m", "yolox_l_vd", "yolox_tiny_vd", "yolox_m_vd", "customs"]  # , "yolox_l_vd", "yolox_tiny_vd", "yolox_m_vd", "customs"
         self.modelDialog = ModelDialog(parent=self, model=self.model)
         self.currentModel = self.modelDialog.currentModel
 
@@ -352,7 +352,6 @@ class MyWindow(QMainWindow, QtStyleTools):
         # self.set_dirty() # 发生更新，可以保存
 
     def current_path(self):
-        
         return self.filePath if os.path.exists(self.filePath) else '.'
 
     def new_data_path(self, user_set=None):
