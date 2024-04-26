@@ -24,6 +24,7 @@ class fileWorker(QThread):
         if os.path.isdir(self.path):
             self.canvas.imgFrames = []
             files = get_image_list(self.path)
+            self.canvas.src_img_names = files
             numFrames = len(files)
             for i, file in enumerate(files):
                 frame = cv2.imread(file)
@@ -33,8 +34,9 @@ class fileWorker(QThread):
         else:
             self.canvas.imgFrames = []
             self.canvas.videoCapture = cv2.VideoCapture(self.path)
-            
+
             numFrames = self.canvas.videoCapture.get(7)
+            self.canvas.src_img_names = ["{}_{}".format(self.path, i) for i in range(0, numFrames)]
             rval = self.canvas.videoCapture.isOpened()
             i = 0
             while rval: 
@@ -44,5 +46,6 @@ class fileWorker(QThread):
                 if i % 30 == 0:
                     self.sinOut.emit("已加载图片帧 {} / {}".format(i, numFrames))
                 i += 1
-        
+        if len(self.canvas.src_img_names) != len(numFrames):
+            print("ERR,exit, files_name {} != numFrames {}".format(len(self.canvas.src_img_names), len(numFrames)))
         self.sinOut.emit("图片帧已加载完成")

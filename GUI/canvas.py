@@ -37,6 +37,7 @@ class canvas(QWidget):
 
         self.numFrames = 0
         self.imgFrames = []  # 储存所有图像帧
+        self.src_img_names = []
         self.curFramesId = 1
 
         self.pixmap = QPixmap()

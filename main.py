@@ -56,6 +56,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.filePath = ""
         self.labelPath = ""
         self.canvas.fileWorker.finished.connect(self.open_file_finish)
+
         self.loadWorker = loadWorker(self.canvas)
         self.loadWorker.sinOut.connect(self.update_load_status)
 
@@ -403,7 +404,8 @@ class MyWindow(QMainWindow, QtStyleTools):
             w = max_x - min_x
             h = max_y - min_y
             classId = VISDRONE_CLASSES.index(shape.label)
-            results.append("{},{},{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id,min_x,min_y,w,h,shape.score,classId))
+            results.append("{},{}|{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id,min_x,min_y,w,h,shape.score,classId))
+            # results.append("{},{}|{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id,min_x,min_y,w,h,shape.score,classId))
             # if shape.auto == 'M':
             #     # TODO
             #     for i in range(1, self.canvas.numFrames + 1):
@@ -432,7 +434,7 @@ class MyWindow(QMainWindow, QtStyleTools):
 
     def keyPressEvent(self, ev):
         key = ev.key()
-        if key == Qt.Key_Delete or key == Qt.Key_D:
+        if key == Qt.Key_Delete or key == Qt.Key_Space:
             self.delete_selected_shape()
         if key == Qt.Key_Left:
             lambda: self.jump_frame(dpos=-1)

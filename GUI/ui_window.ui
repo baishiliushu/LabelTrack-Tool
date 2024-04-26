@@ -240,7 +240,7 @@
          <bool>true</bool>
         </property>
         <property name="shortcut">
-         <string>b</string>
+         <string>a</string>
         </property>
        </widget>
       </item>
@@ -269,7 +269,7 @@
          <bool>true</bool>
         </property>
         <property name="shortcut">
-         <string>n</string>
+         <string>d</string>
         </property>
        </widget>
       </item>
