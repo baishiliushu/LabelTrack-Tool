@@ -41,14 +41,22 @@ cd LabelTrack
 python main.py
 ```
 ```./Tracking/videos``` 有demo视频
+3. handle change annos.txt result cmd:
+```
+3.1 delete error influence-IDs:
+sed -i -e '/,1,/d' annos.txt
+3.2 replace target-IDs:（）
+sed -i 's/,48|/,|,/' annos.txt
+```
 
 ## 已更新
 * 【2022.9.20】手动标注框的更新
 * 【2022.7.16】上传权重文件（百度网盘）
 * 【2022.5.31】取消所有标注框，手动标注框延续所有帧
 * 【2022.5.14】标注图片大小缩放，拖拽；工具栏等按钮完善；标注类别有11种
+* 【2024.4.26】target_id using the "|" apart from boxes[x,y,w,h]
 
-## 待更新
+* ## 待更新
 - [ ] 操作错误提醒完善
 - [ ] 手动标注框的ID从没有出现的开始
 - [ ] 关于视频帧的加载

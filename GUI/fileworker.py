@@ -46,6 +46,6 @@ class fileWorker(QThread):
                 if i % 30 == 0:
                     self.sinOut.emit("已加载图片帧 {} / {}".format(i, numFrames))
                 i += 1
-        if len(self.canvas.src_img_names) != len(numFrames):
-            print("ERR,exit, files_name {} != numFrames {}".format(len(self.canvas.src_img_names), len(numFrames)))
-        self.sinOut.emit("图片帧已加载完成")
+        if len(self.canvas.src_img_names) != numFrames:
+            print("ERR,exit, files_name {} != numFrames {}".format(len(self.canvas.src_img_names), numFrames))
+        self.sinOut.emit("图片帧已加载完成：{}".format(len(self.canvas.src_img_names)))

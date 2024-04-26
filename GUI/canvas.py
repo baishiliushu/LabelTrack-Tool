@@ -143,6 +143,7 @@ class canvas(QWidget):
         self.current.label = self.window.defaultLabel
         self.current.frameId = self.curFramesId
         self.current.score = 1
+        self.current.file_name = self.src_img_names[self.current.id - 1]
         self.current.close()
         # self.shapes.append(self.current)
 
@@ -153,6 +154,7 @@ class canvas(QWidget):
             newManualShape.frameId = i
             self.shapeId += 1
             newManualShape.id = self.shapeId
+
             generate_line_color, generate_fill_color = generate_color_by_text(newManualShape.label)
             newManualShape.line_color = generate_line_color
             newManualShape.fill_color = generate_fill_color
