@@ -447,7 +447,7 @@ class MyWindow(QMainWindow, QtStyleTools):
             self.canvas.rewriteByFixedId(1000)
         if (key >= Qt.Key_0) and (key <= Qt.Key_9):
             self.statusBar.showMessage("[DEBUG]{} ".format(key))
-            self.canvas.rewriteByFixedId(int(key))
+            self.canvas.rewriteByFixedId(int(key) - 48)
 
     def closeEvent(self, event):
         self.save_labels(os.path.splitext(self.filePath)[0] + 'auto_gen_when_exit.txt')
