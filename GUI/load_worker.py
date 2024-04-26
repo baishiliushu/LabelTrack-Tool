@@ -29,7 +29,7 @@ class loadWorker(QThread):
                 # line = line.strip('\n').split(',')
                 line = line.replace("|", ",")
                 line = line.replace(";", ",")
-                line = line.strip('\n').split('|')
+                line = line.strip('\n').split(',')
                 tlwh = [int(line[2]), int(line[3]), int(line[4]), int(line[5])]
                 self.canvas.update_shape(int(line[1]), int(line[0]), int(line[7]), tlwh, float(line[6]), 'L')
                 if i % 10 == 0:
