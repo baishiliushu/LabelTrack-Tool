@@ -62,7 +62,8 @@ class MyWindow(QMainWindow, QtStyleTools):
 
         # add local path manager
         self.data_path = os.path.abspath(os.path.dirname(__file__))
-        self.default_anno_txt = "gt_label.txt"
+        self.data_save_path = None
+        self.default_save_name = ""
 
         # 状态栏
         self.statusBar = self.statusBar() # 状态栏
@@ -209,7 +210,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.vedioSlider.setValue(pos)
         self.canvas.change_frame(pos)
         self.adjust_scale()
-
+        self.statusBar.showMessage("")
 
     # 播放视频
     def video_play(self):
@@ -367,8 +368,8 @@ class MyWindow(QMainWindow, QtStyleTools):
         # image_file_name = os.path.basename(self.filePath)
         # saved_file_name = os.path.splitext(image_file_name)[0]
         savedPath = self.save_file_dialog(remove_ext=False)
-        self.statusBar.showMessage("[Update]{}".format(savedPath))
-        self.save_labels(savedPath)
+        self.data_save_path = savedPath
+        self.save_labels(self.data_save_path)
     
     def save_file_dialog(self, remove_ext=True):
         caption = 'Choose Path to save annotation'
@@ -420,6 +421,7 @@ class MyWindow(QMainWindow, QtStyleTools):
         with open(savedPath, 'w') as f:
             f.writelines(results)
             print("save results to {}".format(savedPath))
+        self.statusBar.showMessage("[Save Apply]{} ".format(savedPath))
 
     # 加载标注文件 .txt
     def load_file(self):
@@ -441,9 +443,12 @@ class MyWindow(QMainWindow, QtStyleTools):
         if key == Qt.Key_Right:
             lambda: self.jump_frame(dpos=1)
         if (key == Qt.Key_S) and QApplication.keyboardModifiers() == Qt.ControlModifier:
-            self.statusBar.showMessage("[DEBUG]ctrl + s ")
+            if self.data_save_path is None:
+                self.save_file()
+            else:
+                self.save_labels(self.data_save_path)
+
         if (key == Qt.Key_Q):
-            self.statusBar.showMessage("[DEBUG]q ")
             self.canvas.rewriteByFixedId(1000)
         if (key >= Qt.Key_0) and (key <= Qt.Key_9):
             self.statusBar.showMessage("[DEBUG]{} ".format(key))
@@ -451,6 +456,8 @@ class MyWindow(QMainWindow, QtStyleTools):
 
     def closeEvent(self, event):
         self.save_labels(os.path.splitext(self.filePath)[0] + 'auto_gen_when_exit.txt')
+        if self.data_save_path is not None:
+            self.save_labels(self.data_save_path)
         sys.exit(0)
 
 
