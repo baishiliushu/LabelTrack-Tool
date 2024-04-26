@@ -246,6 +246,8 @@ class canvas(QWidget):
     def set_editing(self, value=True):
         self.mode = self.EDIT if value else self.CREATE
         if not value:  # Create
+            # add by liangxy: new target fixed id = 1
+            self.shapeId = 0
             self.un_highlight()
             self.de_select_shape()
         self.prev_point = QPointF()

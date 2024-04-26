@@ -217,7 +217,7 @@ class MyWindow(QMainWindow, QtStyleTools):
             self.isPlaying = True
             self.pushButtonPlay.setIcon(QIcon("./GUI/resources/svg/stop.svg"))
             self.pushButtonPlay.setText(" STOP")
-            self.playTimer.start(33)
+            self.playTimer.start(100) #33
         else:
             self.isPlaying = False
             self.pushButtonPlay.setIcon(QIcon("./GUI/resources/svg/play.svg"))
