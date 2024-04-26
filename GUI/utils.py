@@ -156,6 +156,13 @@ def get_image_list(path):
     image_names.sort()
     return image_names
 
+
+def parse_line(line):
+    # 解析每行内容
+    parts = line.strip().split('|')
+    first_element = int(parts[0].split(',')[0])
+    return first_element, line
+
 # QT4 has a trimmed method, in QT5 this is called strip
 if QT5:
     def trimmed(text):

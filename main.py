@@ -27,6 +27,8 @@ from GUI.load_worker import loadWorker
 from GUI.model_dialog import ModelDialog
 from GUI.shape import Shape
 
+from GUI.utils import parse_line
+
 # GPU渲染，加速
 if hasattr(Qt, 'AA_ShareOpenGLContexts'):
     try:
@@ -153,6 +155,7 @@ class MyWindow(QMainWindow, QtStyleTools):
             self.videoFileUrl = QUrl.fromLocalFile(self.filePath)
             # 初始化所有图像帧
             self.canvas.init_frame(self.filePath)
+
 
     def open_file_finish(self):
         self.adjust_scale()
@@ -417,9 +420,11 @@ class MyWindow(QMainWindow, QtStyleTools):
             #     results.append(
             #         f"{shape.frameId},{shape.id},{min_x},{min_y},{w},{h},{shape.score:.2f},{classId},0,0\n"
             #     )
-
+        parsed_lines = [parse_line(line) for line in results]
+        sorted_lines = sorted(parsed_lines, key=lambda x: x[0])
+        sorted_contents = [line for _, line in sorted_lines]
         with open(savedPath, 'w') as f:
-            f.writelines(results)
+            f.writelines(sorted_contents)
             print("save results to {}".format(savedPath))
         self.statusBar.showMessage("[Save Apply]{} ".format(savedPath))
 
@@ -451,7 +456,6 @@ class MyWindow(QMainWindow, QtStyleTools):
         if (key == Qt.Key_Q):
             self.canvas.rewriteByFixedId(1000)
         if (key >= Qt.Key_0) and (key <= Qt.Key_9):
-            self.statusBar.showMessage("[DEBUG]{} ".format(key))
             self.canvas.rewriteByFixedId(int(key) - 48)
 
     def closeEvent(self, event):

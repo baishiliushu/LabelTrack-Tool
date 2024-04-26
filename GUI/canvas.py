@@ -621,7 +621,7 @@ class canvas(QWidget):
                     generate_line_color, generate_fill_color = generate_color_by_text("pedestrian")
                     self.set_shape_label(shape, "pedestrian", id_fixed, generate_line_color, generate_fill_color)
         self.repaint()
-
+        self.update_file_status("[INFO]:re-id to {}".format(id_fixed))
 
     def wheelEvent(self, ev):
         qt_version = 4 if hasattr(ev, "delta") else 5
