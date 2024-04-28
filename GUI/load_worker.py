@@ -23,6 +23,8 @@ class loadWorker(QThread):
         if not os.path.exists(self.labelPath):
             #self.sinOut.emit("[ERR]{} NOT exists.".format(self.labelPath))
             return
+        # solve annos repeat load; todo:new list replace old list
+        self.canvas.shapes = []
         with open(self.labelPath, "r") as f:
             count = len(open(self.labelPath,'rU').readlines())
             for i, line in enumerate(f.readlines(), 1):
