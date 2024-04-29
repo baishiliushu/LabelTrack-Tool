@@ -148,9 +148,15 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.canvas.zoomRequest.connect(self.zoom_request)
         self.prev_label_text = ''
 
+    def clear_when_turn_new_dir(self):
+        self.lineEdit_current_path.setText("")
+        self.canvas.shapes = []
+
     # 打开文件
     def open_file(self):
+        self.clear_when_turn_new_dir()
         self.filePath, _ = QFileDialog.getOpenFileName(self, "Open file", "", "mp4 Video (*.mp4)")
+        print("{}".format(self.filePath))
         if self.filePath.endswith('.mp4'):
             self.videoFileUrl = QUrl.fromLocalFile(self.filePath)
             # 初始化所有图像帧
@@ -162,14 +168,101 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.lineCurFrame.setText("1")
         self.labelTotalFrame.setText(str(self.canvas.numFrames))
         self.vedioSlider.setMaximum(self.canvas.numFrames)
+        self.lineEdit_current_path.setText(self.current_path())
+        self.labelPath = self.filePath
 
     def open_dict(self):
-        target_dir_path = ustr(QFileDialog.getExistingDirectory(self, 'Open Directory', '.', QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks))
-        self.canvas.init_frame(target_dir_path)
+        self.clear_when_turn_new_dir()
+        self.filePath = ustr(QFileDialog.getExistingDirectory(self, 'Open Directory', '.', QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks))
+        self.canvas.init_frame(self.filePath)
         # self.adjust_scale()
         # self.lineCurFrame.setText("1")
         # self.labelTotalFrame.setText(str(self.canvas.numFrames))
         # self.vedioSlider.setMaximum(self.canvas.numFrames)
+        # 加载标注文件 .txt
+
+    def load_file(self):
+        self.statusBar.showMessage("正在加载标注文件，请稍后")
+        self.labelPath, _ = QFileDialog.getOpenFileName(self, "Choose annotation file", "", "txt(*.txt)")
+        self.loadWorker.load_path(self.labelPath)
+        self.data_save_path = self.labelPath
+        self.loadWorker.start()
+
+    def current_path(self):
+        if not os.path.exists(self.filePath):
+            self.filePath  = '.'
+        return self.filePath
+
+    def new_data_path(self, user_set=None):
+        if user_set is not None:
+            tmp_p = os.path.abspath(os.path.dirname(user_set))
+            if os.path.exists(tmp_p):
+                self.data_path = tmp_p
+            self.statusBar.showMessage("[Update]data_path :{}".format(self.data_path))
+
+    def save_file(self):
+        # image_file_dir = os.path.dirname(self.filePath)
+        # image_file_name = os.path.basename(self.filePath)
+        # saved_file_name = os.path.splitext(image_file_name)[0]
+        savedPath = self.save_file_dialog(remove_ext=False)
+        self.data_save_path = savedPath
+        self.save_labels(self.data_save_path)
+
+    def save_file_dialog(self, remove_ext=True):
+        caption = 'Choose Path to save annotation'
+        filters = 'Files Directory(*.*)'
+        # TODO
+        open_dialog_path = self.current_path()
+        dlg = QFileDialog(self, caption, open_dialog_path, filters)
+        # dlg.setDefaultSuffix(LabelFile.suffix[1:])
+        dlg.setAcceptMode(QFileDialog.AcceptSave)
+        filename = 'annos.txt' # os.path.splitext(self.filePath)[0] + 'annos.txt'
+        dlg.selectFile(filename)
+        dlg.setOption(QFileDialog.DontUseNativeDialog, False)
+        if dlg.exec_():
+            full_file_path = ustr(dlg.selectedFiles()[0])
+            if remove_ext:
+                return os.path.splitext(full_file_path)[0]  # Return file path without the extension.
+            else:
+                return full_file_path
+        return os.path.splitext(self.filePath)[0] + 'auto_gen_0.txt'
+
+    def save_labels(self, savedPath):
+        results = []
+        for shape in self.canvas.shapes:
+            min_x = sys.maxsize
+            min_y = sys.maxsize
+            max_x = 0
+            max_y = 0
+            for point in shape.points:
+                min_x = round(min(min_x, point.x()))
+                min_y = round(min(min_y, point.y()))
+                max_x = round(max(max_x, point.x()))
+                max_y = round(max(max_y, point.y()))
+            w = max_x - min_x
+            h = max_y - min_y
+            classId = VISDRONE_CLASSES.index(shape.label)
+            results.append(
+                "{},{}|{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id, min_x, min_y, w, h, shape.score,
+                                                       classId))
+            # results.append("{},{}|{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id,min_x,min_y,w,h,shape.score,classId))
+            # if shape.auto == 'M':
+            #     # TODO
+            #     for i in range(1, self.canvas.numFrames + 1):
+            #         results.append(
+            #         f"{i},{shape.id},{min_x},{min_y},{w},{h},{shape.score:.2f},{classId},0,0\n"
+            #     )
+            # else:
+            #     results.append(
+            #         f"{shape.frameId},{shape.id},{min_x},{min_y},{w},{h},{shape.score:.2f},{classId},0,0\n"
+            #     )
+        parsed_lines = [parse_line(line) for line in results]
+        sorted_lines = sorted(parsed_lines, key=lambda x: x[0])
+        sorted_contents = [line for _, line in sorted_lines]
+        with open(savedPath, 'w') as f:
+            f.writelines(sorted_contents)
+            print("save results to {}".format(savedPath))
+        self.statusBar.showMessage("[Save Apply]{} ".format(savedPath))
 
     def play_frame(self):
         # self.playTimer.start(100 / 3)
@@ -355,85 +448,6 @@ class MyWindow(QMainWindow, QtStyleTools):
         self.canvas.set_editing(True) # edit mode
         self.actionAnnot.setEnabled(True)
         # self.set_dirty() # 发生更新，可以保存
-
-    def current_path(self):
-        return self.filePath if os.path.exists(self.filePath) else '.'
-
-    def new_data_path(self, user_set=None):
-        if user_set is not None:
-            tmp_p = os.path.abspath(os.path.dirname(user_set))
-            if os.path.exists(tmp_p):
-                self.data_path = tmp_p
-            self.statusBar.showMessage("[Update]data_path :{}".format(self.data_path))
-
-    def save_file(self):
-        # image_file_dir = os.path.dirname(self.filePath)
-        # image_file_name = os.path.basename(self.filePath)
-        # saved_file_name = os.path.splitext(image_file_name)[0]
-        savedPath = self.save_file_dialog(remove_ext=False)
-        self.data_save_path = savedPath
-        self.save_labels(self.data_save_path)
-    
-    def save_file_dialog(self, remove_ext=True):
-        caption = 'Choose Path to save annotation'
-        filters = 'Files Directory(*.*)'
-        # TODO
-        open_dialog_path = self.current_path()
-        dlg = QFileDialog(self, caption, open_dialog_path, filters)
-        # dlg.setDefaultSuffix(LabelFile.suffix[1:])
-        dlg.setAcceptMode(QFileDialog.AcceptSave)
-        filename = os.path.splitext(self.filePath)[0] + 'annos.txt'
-        dlg.selectFile(filename)
-        dlg.setOption(QFileDialog.DontUseNativeDialog, False)
-        if dlg.exec_():
-            full_file_path = ustr(dlg.selectedFiles()[0])
-            if remove_ext:
-                return os.path.splitext(full_file_path)[0]  # Return file path without the extension.
-            else:
-                return full_file_path
-        return os.path.splitext(self.filePath)[0] + 'auto_gen_0.txt'
-        
-    def save_labels(self, savedPath):
-        results = []
-        for shape in self.canvas.shapes:
-            min_x = sys.maxsize
-            min_y = sys.maxsize
-            max_x = 0
-            max_y = 0
-            for point in shape.points:
-                min_x = round(min(min_x, point.x()))
-                min_y = round(min(min_y, point.y()))
-                max_x = round(max(max_x, point.x()))
-                max_y = round(max(max_y, point.y()))
-            w = max_x - min_x
-            h = max_y - min_y
-            classId = VISDRONE_CLASSES.index(shape.label)
-            results.append("{},{}|{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id,min_x,min_y,w,h,shape.score,classId))
-            # results.append("{},{}|{},{},{},{},{},{},0,0\n".format(shape.frameId, shape.id,min_x,min_y,w,h,shape.score,classId))
-            # if shape.auto == 'M':
-            #     # TODO
-            #     for i in range(1, self.canvas.numFrames + 1):
-            #         results.append(
-            #         f"{i},{shape.id},{min_x},{min_y},{w},{h},{shape.score:.2f},{classId},0,0\n"
-            #     )
-            # else:
-            #     results.append(
-            #         f"{shape.frameId},{shape.id},{min_x},{min_y},{w},{h},{shape.score:.2f},{classId},0,0\n"
-            #     )
-        parsed_lines = [parse_line(line) for line in results]
-        sorted_lines = sorted(parsed_lines, key=lambda x: x[0])
-        sorted_contents = [line for _, line in sorted_lines]
-        with open(savedPath, 'w') as f:
-            f.writelines(sorted_contents)
-            print("save results to {}".format(savedPath))
-        self.statusBar.showMessage("[Save Apply]{} ".format(savedPath))
-
-    # 加载标注文件 .txt
-    def load_file(self):
-        self.statusBar.showMessage("正在加载标注文件，请稍后")
-        self.labelPath, _ = QFileDialog.getOpenFileName(self, "Choose annotation file", "", "txt(*.txt)")
-        self.loadWorker.load_path(self.labelPath)
-        self.loadWorker.start()
 
     # 删除选中的框
     def delete_selected_shape(self):
