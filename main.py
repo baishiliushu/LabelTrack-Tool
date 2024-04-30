@@ -474,8 +474,8 @@ class MyWindow(QMainWindow, QtStyleTools):
 
     def closeEvent(self, event):
         self.save_labels(os.path.splitext(self.filePath)[0] + 'auto_gen_when_exit.txt')
-        if self.data_save_path is not None:
-            self.save_labels(self.data_save_path)
+        # if self.data_save_path is not None:
+        #     self.save_labels(self.data_save_path)
         sys.exit(0)
 
 

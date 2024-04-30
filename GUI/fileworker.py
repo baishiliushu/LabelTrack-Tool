@@ -33,6 +33,8 @@ class fileWorker(QThread):
                     self.sinOut.emit("已加载图片帧 {} / {}".format(i, numFrames))
         else:
             self.canvas.imgFrames = []
+            if "mp4" not in self.path:
+                return
             self.canvas.videoCapture = cv2.VideoCapture(self.path)
 
             numFrames = self.canvas.videoCapture.get(7)

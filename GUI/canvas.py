@@ -75,14 +75,20 @@ class canvas(QWidget):
     # finish
     def load_frames(self):
         self.trackWorker.load_frames(self.imgFrames) # 跟踪加载图片帧
+        if len(self.imgFrames) < 1:
+            return
         self.numFrames = len(self.imgFrames) # 获取视频的总帧数
+
         frame_0 = self.imgFrames[0]
         Qframe_0 = img_cv_to_qt(frame_0)
         self.load_pixmap(QPixmap.fromImage(Qframe_0))
 
     def change_frame(self, num):
         n = num - 1
+        if n > len(self.imgFrames) or n < 0:
+            return
         self.curFramesId = num
+
         frame_n = self.imgFrames[n]
         Qframe_n = img_cv_to_qt(frame_n)
         self.load_pixmap(QPixmap.fromImage(Qframe_n))
